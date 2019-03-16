@@ -22,16 +22,16 @@ contract TaxableAccount {
     }
 
     function () external payable {
-        totalReceived += msg.value;
-        uint256 amountToWithhold = msg.value * withholdingPercent / 100;
-        locked += amountToWithhold;
-        totalWithheld += amountToWithhold;
+        totalReceived = totalReceived.add(msg.value);
+        uint256 amountToWithhold = msg.value.mul(withholdingPercent).div(100);
+        locked = locked.add(amountToWithhold);
+        totalWithheld = totalWithheld.add(amountToWithhold);
         controller.logTaxableTransaction(msg.sender, address(this), msg.value);
     }
 
     function send(address payable _receiver, uint256 _amount) external {
         require(msg.sender == owner);
-        uint256 availableFunds = address(this).balance - locked;  // throws if negative available
+        uint256 availableFunds = address(this).balance.sub(locked);  // throws if negative available
         require(availableFunds >= _amount);
 
         _receiver.transfer(_amount);
@@ -40,7 +40,7 @@ contract TaxableAccount {
     function resolveTaxes(uint256 _newWithholdingPercent) external payable {
         require(msg.sender == controller.owner());
         require(msg.value == getReceivablesFromTaxOffice());
-        require(_newWithholdingPercent < 100 && _newWithholdingPercent >= 0);
+        require(_newWithholdingPercent >= 0 && _newWithholdingPercent < 100);
 
         // Handle the case where too much tax was withheld, and tax office returns it
         if (msg.value > 0) {
@@ -51,7 +51,7 @@ contract TaxableAccount {
             return;
         }
 
-        uint256 newLocked = locked + getExtraTaxToPay();
+        uint256 newLocked = locked.add(getExtraTaxToPay());
         uint256 payables;
 
         if (address(this).balance >= newLocked) {
@@ -60,7 +60,7 @@ contract TaxableAccount {
         }
         else {
             payables = address(this).balance;
-            newLocked -= address(this).balance;
+            newLocked = newLocked.sub(address(this).balance);
         }
 
         locked = newLocked;
@@ -73,7 +73,7 @@ contract TaxableAccount {
     // Return the amount of taxes that still needs to be paid this period.
     function getExtraTaxToPay() private view returns (uint256) {
         uint256 taxToPay = controller.getTaxToPay(totalReceived);
-        return taxToPay - totalWithheld;
+        return taxToPay.sub(totalWithheld);
     }
 
     // Get the amount that tax office owes this account
@@ -82,7 +82,7 @@ contract TaxableAccount {
         if (taxToPay > locked) {
             return 0;
         }
-        return locked - taxToPay;
+        return locked.sub(taxToPay);
     }
 }
 
@@ -116,7 +116,7 @@ contract EthTax {
     function makeAccount(address _owner, uint256 _initialWithholdingPercent)
         external returns (address account)
     {
-        require(_initialWithholdingPercent < 100 && _initialWithholdingPercent >= 0);
+        require(_initialWithholdingPercent >= 0 && _initialWithholdingPercent < 100);
         require(msg.sender == owner);
         account = address(new TaxableAccount(this, _owner, _initialWithholdingPercent));
         emit LogNewAccount(account);
@@ -132,16 +132,16 @@ contract EthTax {
 
         for (uint256 i=0; i<taxBrackets.length; i++) {
             if (unprocessedAmount <= taxBrackets[i].maxAmount) {
-                taxToPay += unprocessedAmount * taxBrackets[i].taxPercent / 100;
+                taxToPay = taxToPay.add(unprocessedAmount.mul(taxBrackets[i].taxPercent).div(100));
                 return taxToPay;
             }
             else {
-                taxToPay += taxBrackets[i].maxAmount * taxBrackets[i].taxPercent / 100;
-                unprocessedAmount -= taxBrackets[i].maxAmount;
+                taxToPay = taxToPay.add(taxBrackets[i].maxAmount.mul(taxBrackets[i].taxPercent).div(100));
+                unprocessedAmount = unprocessedAmount.sub(taxBrackets[i].maxAmount);
             }
         }
 
-        taxToPay += unprocessedAmount * taxPercentAfterBrackets / 100;
+        taxToPay = taxToPay.add(unprocessedAmount.mul(taxPercentAfterBrackets).div(100));
         return taxToPay;
     }
 }
