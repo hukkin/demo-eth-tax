@@ -1,0 +1,53 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Ethereum Tax</title>
+
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="bower_components/dynatable/jquery.dynatable.css">
+  <link rel="stylesheet" href="status.css">
+</head>
+
+<body>
+  <div>
+    <h3>Taxable Accounts</h3>
+    <table id="taxableAccounts" class="table table-bordered">
+      <thead>
+        <th>Address</th>
+        <th>Balance</th>
+        <th>Locked balance</th>
+        <th>Funds received this period</th>
+        <th>Funds withheld this period</th>
+        <th>Withholding percent</th>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+
+  <!--
+  <div>
+    <h3>Balances</h3>
+    <table id="balances" class="table table-bordered">
+      <thead>
+        <th>Identity</th>
+        <th>Account</th>
+        <th>Balance</th>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+  -->
+
+  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script src="bower_components/dynatable/jquery.dynatable.js"></script>
+  <script src="bower_components/web3/dist/web3.min.js"></script>
+  <script src="bower_components/moment/min/moment.min.js"></script>
+  <script src="ethtax-address-and-abi.js"></script>
+  <script src="status.js"></script>
+</body>
+</html>
