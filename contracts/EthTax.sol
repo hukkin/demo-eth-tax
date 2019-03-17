@@ -67,7 +67,7 @@ contract TaxableAccount {
         totalReceived = 0;
         totalWithheld = 0;
         withholdingPercent = _newWithholdingPercent;
-        controller.taxDestination().transfer(msg.value);
+        controller.taxDestination().transfer(payables);
     }
 
     // Return the amount of taxes that still needs to be paid this period.
