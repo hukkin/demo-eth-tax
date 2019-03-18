@@ -19,3 +19,14 @@ config/test/contracts.json
 build
 dist
 package-lock.json
+
+# Ignore openzeppelin
+contracts/openzeppelin-solidity-*/*
+# Make exception for openzeppelin LICENSE
+!contracts/openzeppelin-solidity-*/LICENSE
+# Make exception for openzeppelin SafeMath.sol
+!contracts/openzeppelin-solidity-*/contracts/
+contracts/openzeppelin-solidity-*/contracts/*
+!contracts/openzeppelin-solidity-*/contracts/math/
+contracts/openzeppelin-solidity-*/contracts/math/*
+!contracts/openzeppelin-solidity-*/contracts/math/SafeMath.sol

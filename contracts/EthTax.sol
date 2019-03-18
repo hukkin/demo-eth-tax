@@ -1,6 +1,6 @@
 pragma solidity >=0.5.0 <0.6.0;
 
-import './SafeMath.sol';
+import './openzeppelin-solidity-2.2.0/contracts/math/SafeMath.sol';
 
 contract TaxableAccount {
     using SafeMath for uint256;
