@@ -13,12 +13,14 @@ contract TaxableAccount {
     uint256 public withholdingPercent;
 
     constructor(EthTax _controller, address _owner, uint256 _initialWithholdingPercent) public {
+        require(_initialWithholdingPercent >= 0 && _initialWithholdingPercent < 100);
+
         controller = _controller;
         owner = _owner;
         locked = 0;
         totalReceived = 0;
         totalWithheld = 0;
-        setWithholdingPercent(_initialWithholdingPercent);
+        withholdingPercent = _initialWithholdingPercent;
     }
 
     function () external payable {
@@ -67,7 +69,7 @@ contract TaxableAccount {
         controller.taxDestination().transfer(payables);
     }
 
-    function setWithholdingPercent(uint256 _withholdingPercent) public {
+    function setWithholdingPercent(uint256 _withholdingPercent) external {
         require(msg.sender == controller.owner());
         require(_withholdingPercent >= 0 && _withholdingPercent < 100);
 
