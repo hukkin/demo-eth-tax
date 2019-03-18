@@ -29,7 +29,7 @@ ganache-cli --deterministic --port 7545 --networkId 5777 --gasLimit 16000000
 ### Deploy the contract
 In the project root, run:
 ```shell
-truffle migrate
+rm -rf build/ && truffle migrate
 ```
 ### Run the taxable account creator script
 
@@ -50,9 +50,16 @@ node 1-fundAccount.js 15000
 ```
 The account can be funded multiple times with various values.
 
+### Change tax withholding percentage
+
+```shell
+cd demo/
+node 2-setWithholdingPercentage.js 25
+```
+
 ### End the tax period and resolve taxes
 
 ```shell
 cd demo/
-node 2-resolveTaxes.js
+node 3-resolveTaxes.js
 ```

@@ -271,16 +271,25 @@ const taxableAccountAbi = [
     },
     {
       "constant": false,
-      "inputs": [
-        {
-          "name": "_newWithholdingPercent",
-          "type": "uint256"
-        }
-      ],
+      "inputs": [],
       "name": "resolveTaxes",
       "outputs": [],
       "payable": true,
       "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_withholdingPercent",
+          "type": "uint256"
+        }
+      ],
+      "name": "setWithholdingPercent",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
