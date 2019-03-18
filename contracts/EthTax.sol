@@ -15,10 +15,10 @@ contract TaxableAccount {
     constructor(EthTax _controller, address _owner, uint256 _initialWithholdingPercent) public {
         controller = _controller;
         owner = _owner;
-        withholdingPercent = _initialWithholdingPercent;
         locked = 0;
         totalReceived = 0;
         totalWithheld = 0;
+        setWithholdingPercent(_initialWithholdingPercent);
     }
 
     function () external payable {
@@ -37,17 +37,15 @@ contract TaxableAccount {
         _receiver.transfer(_amount);
     }
 
-    function resolveTaxes(uint256 _newWithholdingPercent) external payable {
+    function resolveTaxes() external payable {
         require(msg.sender == controller.owner());
         require(msg.value == getReceivablesFromTaxOffice());
-        require(_newWithholdingPercent >= 0 && _newWithholdingPercent < 100);
 
         // Handle the case where too much tax was withheld, and tax office returns it
         if (msg.value > 0) {
             locked = 0;
             totalReceived = 0;
             totalWithheld = 0;
-            withholdingPercent = _newWithholdingPercent;
             return;
         }
 
@@ -66,8 +64,14 @@ contract TaxableAccount {
         locked = newLocked;
         totalReceived = 0;
         totalWithheld = 0;
-        withholdingPercent = _newWithholdingPercent;
         controller.taxDestination().transfer(payables);
+    }
+
+    function setWithholdingPercent(uint256 _withholdingPercent) public {
+        require(msg.sender == controller.owner());
+        require(_withholdingPercent >= 0 && _withholdingPercent < 100);
+
+        withholdingPercent = _withholdingPercent;
     }
 
     // Return the amount of taxes that still needs to be paid this period.
@@ -116,8 +120,8 @@ contract EthTax {
     function makeAccount(address _owner, uint256 _initialWithholdingPercent)
         external returns (address account)
     {
-        require(_initialWithholdingPercent >= 0 && _initialWithholdingPercent < 100);
         require(msg.sender == owner);
+
         account = address(new TaxableAccount(this, _owner, _initialWithholdingPercent));
         emit LogNewAccount(account);
     }
