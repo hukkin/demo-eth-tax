@@ -43,7 +43,7 @@ contract TaxableAccount {
         require(success);
     }
 
-    function resolveTaxes() external payable {
+    function resolveTaxes() external {
         require(msg.sender == controller.owner());
 
         // Handle the case where too much tax was withheld, and tax office returns it
