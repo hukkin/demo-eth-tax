@@ -12,8 +12,7 @@ const ethTaxAbi = [
       ],
       "payable": false,
       "stateMutability": "view",
-      "type": "function",
-      "signature": "0x2c547b3d"
+      "type": "function"
     },
     {
       "constant": true,
@@ -27,8 +26,7 @@ const ethTaxAbi = [
       ],
       "payable": false,
       "stateMutability": "view",
-      "type": "function",
-      "signature": "0x7a1275c0"
+      "type": "function"
     },
     {
       "constant": true,
@@ -42,15 +40,13 @@ const ethTaxAbi = [
       ],
       "payable": false,
       "stateMutability": "view",
-      "type": "function",
-      "signature": "0x8da5cb5b"
+      "type": "function"
     },
     {
       "inputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
-      "type": "constructor",
-      "signature": "constructor"
+      "type": "constructor"
     },
     {
       "anonymous": false,
@@ -62,8 +58,7 @@ const ethTaxAbi = [
         }
       ],
       "name": "LogNewAccount",
-      "type": "event",
-      "signature": "0x869590ee448633ba93ac7cd3c1b7f474e232993d28e28151aa793fc59ae60aa8"
+      "type": "event"
     },
     {
       "anonymous": false,
@@ -85,8 +80,7 @@ const ethTaxAbi = [
         }
       ],
       "name": "LogTaxableTransaction",
-      "type": "event",
-      "signature": "0xfd1e394e15fbdf7a55c99e6c1d55b07731d618af021d116a21170e5258980333"
+      "type": "event"
     },
     {
       "constant": false,
@@ -109,8 +103,7 @@ const ethTaxAbi = [
       ],
       "payable": false,
       "stateMutability": "nonpayable",
-      "type": "function",
-      "signature": "0x906da583"
+      "type": "function"
     },
     {
       "constant": false,
@@ -132,8 +125,7 @@ const ethTaxAbi = [
       "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
-      "type": "function",
-      "signature": "0xac24d235"
+      "type": "function"
     },
     {
       "constant": true,
@@ -152,8 +144,7 @@ const ethTaxAbi = [
       ],
       "payable": false,
       "stateMutability": "view",
-      "type": "function",
-      "signature": "0xd7b74b39"
+      "type": "function"
     }
   ];
 const taxableAccountAbi = [
@@ -290,20 +281,6 @@ const taxableAccountAbi = [
       "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getReceivablesFromTaxOffice",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
       "type": "function"
     }
   ];

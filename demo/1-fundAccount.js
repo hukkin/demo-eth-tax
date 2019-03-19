@@ -6,5 +6,8 @@ if (typeof process.argv[2] === 'undefined') {
 }
 let amount = parseInt(process.argv[2], 10);
 
-Common.web3.eth.sendTransaction({from: Common.accounts.ethTaxOwner, to: Common.taxableAccountAddress, value: amount});
+let funder = Common.accounts.ethTaxOwner;
+let accountToFund = Common.accounts['taxableAccounts'][0];
+
+Common.web3.eth.sendTransaction({from: funder, to: accountToFund, value: amount});
 console.log('Funded account with ' + amount + ' wei');

@@ -63,3 +63,10 @@ node 2-setWithholdingPercentage.js 25
 cd demo/
 node 3-resolveTaxes.js
 ```
+
+### Withdraw funds from a taxable account
+
+```shell
+cd demo/
+node 4-sendFromTaxableAccount.js 123
+```

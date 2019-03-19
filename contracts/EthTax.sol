@@ -36,16 +36,29 @@ contract TaxableAccount {
         uint256 availableFunds = address(this).balance.sub(locked);  // throws if negative available
         require(availableFunds >= _amount);
 
-        _receiver.transfer(_amount);
+        // Send funds using .call.value(amount)("") instead of the reentrancy safe
+        // .transfer(amount) so that we have enough gas to send to another taxable account.
+        (bool success, bytes memory __data) = _receiver.call.value(_amount)("");
+        (__data);  // Silence the compiler warning about unused local variable
+        require(success);
     }
 
     function resolveTaxes() external payable {
         require(msg.sender == controller.owner());
-        require(msg.value == getReceivablesFromTaxOffice());
 
         // Handle the case where too much tax was withheld, and tax office returns it
-        if (msg.value > 0) {
-            locked = 0;
+        if (isEnoughTaxLocked()) {
+            // TODO: Bug. This can go negative. It is possible we pay too little taxes during period,
+            // but we still have enough locked funds to pay everything.
+            // Example steps:
+            //   - node 1-fundAccount.js 1000
+            //   - node 3-resolveTaxes.js
+            //   - node 2-setWithholdingPercentage.js 1
+            //   - node 1-fundAccount.js 1000
+            //   - node 3-resolveTaxes.js
+            // ---> ERROR
+            uint256 extraTaxLocked = totalWithheld.sub(controller.getTaxToPay(totalReceived));
+            locked = locked.sub(extraTaxLocked);
             totalReceived = 0;
             totalWithheld = 0;
             return;
@@ -82,13 +95,12 @@ contract TaxableAccount {
         return taxToPay.sub(totalWithheld);
     }
 
-    // Get the amount that tax office owes this account
-    function getReceivablesFromTaxOffice() public view returns (uint256) {
+    function isEnoughTaxLocked() private view returns (bool) {
         uint256 taxToPay = controller.getTaxToPay(totalReceived);
         if (taxToPay > locked) {
-            return 0;
+            return false;
         }
-        return locked.sub(taxToPay);
+        return true;
     }
 }
 
