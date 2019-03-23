@@ -6,7 +6,13 @@ if (typeof web3 !== 'undefined') {
 }
 
 let taxableAccounts = [];
-var dynatable = $('#taxableAccounts').dynatable().data('dynatable');
+let otherBalances = [];
+otherBalances.push({identity: 'Tax office', address: web3.eth.accounts[0], balance: 'unknown'})
+otherBalances.push({identity: 'Taxable account owner', address: web3.eth.accounts[1], balance: 'unknown'})
+
+var taxablesDynatable = $('#taxableAccounts').dynatable().data('dynatable');
+var othersDynatable = $('#otherBalances').dynatable().data('dynatable');
+
 ethTax = web3.eth.contract(ethTaxAbi).at(ethTaxAddress);
 
 function getAllAccountData(address) {
@@ -93,13 +99,14 @@ ethTax.LogNewAccount().watch(function(error, result) {
             newAccount.lockedBalance = locked;
             newAccount.withholdingPercent = withholdingPercent;
             newAccount.balance = balance;
+            newAccount.spendableBalance = balance - locked;
             taxableAccounts.push(newAccount);
-            updateDynatable(dynatable, taxableAccounts);
+            updateDynatable(taxablesDynatable, taxableAccounts);
         });
     } else {console.log("error");}
 });
 
-function updateTable() {
+function updateTaxablesTable() {
     taxableAccounts.forEach(function(account, index, theArray) {
         getAllAccountData(account.address).then(([totalReceived, totalWithheld, locked, withholdingPercent, balance]) => {
             account.fundsReceivedThisPeriod = totalReceived;
@@ -107,14 +114,27 @@ function updateTable() {
             account.lockedBalance = locked;
             account.withholdingPercent = withholdingPercent;
             account.balance = balance;
+            account.spendableBalance = balance - locked;
             theArray[index] = account;
         });
     });
-    console.log("Updating dynatable")
-    updateDynatable(dynatable, taxableAccounts);
+    console.log("Updating dynatable");
+    updateDynatable(taxablesDynatable, taxableAccounts);
 }
 
-var tableUpdater = setInterval(updateTable, 3000);
+function updateOtherBalancesTable() {
+    otherBalances.forEach(function(account, index, theArray) {
+        getBalance(account.address).then((balance) => {
+            account.balance = balance;
+            theArray[index] = account;
+        });
+    });
+    console.log("Updating other balances dynatable");
+    updateDynatable(othersDynatable, otherBalances);
+}
+
+const taxablesTableUpdater = setInterval(updateTaxablesTable, 3000);
+const othersTableUpdater = setInterval(updateOtherBalancesTable, 3000);
 
 
 function updateDynatable(table, content) {
