@@ -7,7 +7,14 @@ Before the first run, dependencies need to be installed for the test scripts and
 ```shell
 npm install -g ganache-cli
 npm install -g bower
+npm install -g truffle
 ```
+
+The demo has been tested to work with the following software versions:
+* nodejs@v11.12.0
+* ganache-cli@6.4.1
+* bower@1.8.8
+* truffle@5.0.9
 
 ```shell
 cd demo/

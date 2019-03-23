@@ -46,40 +46,33 @@ contract TaxableAccount {
     function resolveTaxes() external {
         require(msg.sender == controller.owner());
 
-        // Handle the case where too much tax was withheld, and tax office returns it
-        if (isEnoughTaxLocked()) {
-            // TODO: Bug. This can go negative. It is possible we pay too little taxes during period,
-            // but we still have enough locked funds to pay everything.
-            // Example steps:
-            //   - node 1-fundAccount.js 1000
-            //   - node 3-resolveTaxes.js
-            //   - node 2-setWithholdingPercentage.js 1
-            //   - node 1-fundAccount.js 1000
-            //   - node 3-resolveTaxes.js
-            // ---> ERROR
-            uint256 extraTaxLocked = totalWithheld.sub(controller.getTaxToPay(totalReceived));
+        uint256 taxToPay = controller.getTaxToPay(totalReceived);
+        // If too much tax withheld, unlock balance
+        if (totalWithheld > taxToPay) {
+            uint256 extraTaxLocked = totalWithheld.sub(taxToPay);
             locked = locked.sub(extraTaxLocked);
-            totalReceived = 0;
-            totalWithheld = 0;
-            return;
+        }
+        // If too little tax withheld, lock more balance
+        else {
+            uint256 missingLockedTax = taxToPay.sub(totalWithheld);
+            locked = locked.add(missingLockedTax);
         }
 
-        uint256 newLocked = locked.add(getExtraTaxToPay());
         uint256 payables;
-
-        if (address(this).balance >= newLocked) {
-            payables = newLocked;
-            newLocked = 0;
+        if (address(this).balance >= locked) {
+            payables = locked;
         }
         else {
             payables = address(this).balance;
-            newLocked = newLocked.sub(address(this).balance);
         }
 
-        locked = newLocked;
+        locked = locked.sub(payables);
         totalReceived = 0;
         totalWithheld = 0;
-        controller.taxDestination().transfer(payables);
+
+        if (payables != 0) {
+            controller.taxDestination().transfer(payables);
+        }
     }
 
     function setWithholdingPercent(uint256 _withholdingPercent) external {
@@ -87,20 +80,6 @@ contract TaxableAccount {
         require(_withholdingPercent >= 0 && _withholdingPercent < 100);
 
         withholdingPercent = _withholdingPercent;
-    }
-
-    // Return the amount of taxes that still needs to be paid this period.
-    function getExtraTaxToPay() private view returns (uint256) {
-        uint256 taxToPay = controller.getTaxToPay(totalReceived);
-        return taxToPay.sub(totalWithheld);
-    }
-
-    function isEnoughTaxLocked() private view returns (bool) {
-        uint256 taxToPay = controller.getTaxToPay(totalReceived);
-        if (taxToPay > locked) {
-            return false;
-        }
-        return true;
     }
 }
 
